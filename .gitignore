@@ -1,0 +1,8 @@
+package.json
+node_modules
+
+/client/node_modules/
+/server/node_modules/
+/server/yarn.lock
+/.env
+.DS_Store
