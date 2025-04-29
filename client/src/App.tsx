@@ -1,35 +1,78 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import "./App.css";
+import { gql, useQuery } from "@apollo/client";
+const query = gql`
+  query GetAllTodods {
+    getTodos(limit: 10) {
+      id
+      title
+      user {
+        id
+        name
+        email
+      }
+    }
+  }
+`;
+
+type TodoType = {
+  id: number;
+  title: string;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+  };
+};
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { data, error, loading } = useQuery(query);
 
+  if (error)
+    return (
+      <>
+        <h4>Something went wrong</h4>
+      </>
+    );
+  if (loading)
+    return (
+      <>
+        <h4>Loading, please wait...</h4>
+      </>
+    );
+  console.log("data", data);
   return (
     <>
       <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <table border={1}>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Title</th>
+              <th>User</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.getTodos?.map((item: TodoType, index: number) => {
+              return (
+                <tr key={index}>
+                  <td>{item.id}</td>
+                  <td>{item.title}</td>
+                  <td>
+                    <ul>
+                      <li>User id: {item.user.id}</li>
+                      <li>Name: {item.user.name}</li>
+                      <li>Email: {item.user.email}</li>
+                    </ul>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

@@ -28,7 +28,7 @@ async function startServer() {
       }
 
       type Query {
-        getTodos: [Todo]
+        getTodos(limit: Int): [Todo]
         getAllUsers:[User]
         getUser(id:ID!):User
       }
@@ -43,8 +43,12 @@ async function startServer() {
           ).data,
       },
       Query: {
-        getTodos: async () =>
-          (await axios.get("https://jsonplaceholder.typicode.com/todos")).data,
+        getTodos: async (parent, { limit }) => {
+          const res = await axios.get(
+            "https://jsonplaceholder.typicode.com/todos"
+          );
+          return limit ? res.data.slice(0, limit) : res.data;
+        },
         getAllUsers: async () =>
           (await axios.get("https://jsonplaceholder.typicode.com/users")).data,
         getUser: async (parent, { id }) =>
